@@ -58,7 +58,7 @@ export function nextUrl(ctx: ReturnType<typeof getContext>) {
   const totalSteps = PAIRS.length * VARIANTS.length; // 12
   const nextStep = ctx.step + 1;
   if (nextStep >= totalSteps) {
-    return `https://tally.so/r/FINAL_FORM_ID?pid=${ctx.pid}&grip=${ctx.grip}`;
+    return `https://tally.so/r/gD17jO?pid=${ctx.pid}&grip=${ctx.grip}`;
   }
 
   const nextPairIndex = Math.floor(nextStep / VARIANTS.length);
