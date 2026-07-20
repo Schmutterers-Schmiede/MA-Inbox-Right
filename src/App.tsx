@@ -11,7 +11,12 @@ declare global {
 // ─── Configuration ────────────────────────────────────────────────────────────
 // "left"  → drag item left to reveal Delete on the right  (right-handed default)
 // "right" → drag item right to reveal Delete on the left  (left-handed variant)
-const SWIPE_DIRECTION: 'left' | 'right' = 'left'
+// This names the variant by the hand it's designed for, matching the
+// convention used in the other prototypes (e.g. CC_TRIGGER_SIDE, TOGGLE_POSITION).
+// "right" → right-handed default: drag item left to reveal Delete on the right
+// "left"  → left-handed variant: drag item right to reveal Delete on the left
+const HANDEDNESS: 'left' | 'right' = 'right'
+const SWIPE_DIRECTION: 'left' | 'right' = HANDEDNESS === 'right' ? 'left' : 'right'
 
 const DELETE_THRESHOLD = 0.35 // fraction of item width that commits delete
 const EDGE_INSET = 20        // px inset from screen edge before gesture starts
