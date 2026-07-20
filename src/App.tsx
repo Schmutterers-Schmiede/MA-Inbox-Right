@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from 'react'
 import { getContext, nextUrl, INSTRUCTIONS } from './tallyFlow'
 import { InstructionsOverlay } from './InstructionsOverlay'
+import { GRIP_IMAGES } from './gripImages';
 
 declare global {
   interface Window {
@@ -21,7 +22,7 @@ const SWIPE_DIRECTION: 'left' | 'right' = HANDEDNESS === 'right' ? 'left' : 'rig
 const DELETE_THRESHOLD = 0.35 // fraction of item width that commits delete
 const EDGE_INSET = 20        // px inset from screen edge before gesture starts
 const REQUIRED_DELETE_COUNT = 3 // number of messages participants must delete to complete the task
-
+const ctx = getContext();
 // ─── Data ─────────────────────────────────────────────────────────────────────
 interface Message {
   id: string
@@ -480,9 +481,10 @@ export default function App() {
       {/* Instructions overlay, shown until participant taps Start */}
       {showInstructions && (
         <InstructionsOverlay
-          title={INSTRUCTIONS.message_inbox.title}
-          instructions={INSTRUCTIONS.message_inbox.text}
+          title={INSTRUCTIONS.control_center.title}
+          instructions={INSTRUCTIONS.control_center.text}
           onStart={handleStart}
+          gripImage={GRIP_IMAGES[ctx.grip]}
         />
       )}
     </div>

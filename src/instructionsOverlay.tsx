@@ -4,9 +4,11 @@ type Props = {
   onStart: () => void;
   /** Only set this for prototypes that involve a corner swipe gesture. */
   swipeSide?: "left" | "right";
+  /** Image showing the participant's assigned grip type, if available. */
+  gripImage?: string;
 };
 
-export function InstructionsOverlay({ title, instructions, onStart, swipeSide }: Props) {
+export function InstructionsOverlay({ title, instructions, onStart, swipeSide, gripImage }: Props) {
   return (
     <div className="fixed inset-0 z-[100] bg-black/90 flex flex-col items-center justify-center px-8 text-center">
       {swipeSide && (
@@ -28,6 +30,15 @@ export function InstructionsOverlay({ title, instructions, onStart, swipeSide }:
       )}
 
       <h2 className="text-white text-lg font-semibold mb-4">{title}</h2>
+
+      {gripImage && (
+        <img
+          src={gripImage}
+          alt="Hold your phone like this"
+          className="w-40 h-auto mb-4 rounded-xl"
+        />
+      )}
+
       <p className="text-white/80 text-sm leading-relaxed mb-8">{instructions}</p>
       <button
         onClick={onStart}
