@@ -1,4 +1,12 @@
 import { useState, useRef, useCallback } from 'react'
+import { getContext, nextUrl, INSTRUCTIONS } from './tallyFlow'
+import { InstructionsOverlay } from './InstructionsOverlay'
+
+declare global {
+  interface Window {
+    Tally: any
+  }
+}
 
 // ─── Configuration ────────────────────────────────────────────────────────────
 // "left"  → drag item left to reveal Delete on the right  (right-handed default)
@@ -7,6 +15,7 @@ const SWIPE_DIRECTION: 'left' | 'right' = 'left'
 
 const DELETE_THRESHOLD = 0.35 // fraction of item width that commits delete
 const EDGE_INSET = 20        // px inset from screen edge before gesture starts
+const REQUIRED_DELETE_COUNT = 3 // number of messages participants must delete to complete the task
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 interface Message {
@@ -74,9 +83,10 @@ interface SwipeItemProps {
   message: Message
   onDelete: (id: string) => void
   highlight?: boolean
+  disabled?: boolean
 }
 
-function SwipeItem({ message, onDelete, highlight }: SwipeItemProps) {
+function SwipeItem({ message, onDelete, highlight, disabled }: SwipeItemProps) {
   const itemRef = useRef<HTMLDivElement>(null)
   const [offset, setOffset] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
@@ -92,7 +102,7 @@ function SwipeItem({ message, onDelete, highlight }: SwipeItemProps) {
   }, [message.id, onDelete])
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    if (isDeleting) return
+    if (isDeleting || disabled) return
 
     const el = itemRef.current
     if (!el) return
@@ -267,6 +277,28 @@ function SwipeItem({ message, onDelete, highlight }: SwipeItemProps) {
             style={{ backgroundColor: '#6C63FF' }}
           />
         )}
+
+        {/* Swipe hint: shows where to place a finger and which way to drag.
+            Positioned on the side opposite the delete reveal, so the whole
+            gesture stays clear of the true screen edge. */}
+        {!isDeleting && !disabled && Math.abs(offset) < 4 && (
+          <div
+            className="absolute top-1/2 -translate-y-1/2 flex flex-col items-center gap-0.5 pointer-events-none"
+            style={{ [SWIPE_DIRECTION === 'left' ? 'right' : 'left']: '28%' }}
+          >
+            <div className="w-8 h-8 rounded-full border-2 border-red-500 flex items-center justify-center bg-white/70">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                {SWIPE_DIRECTION === 'left' ? (
+                  <polyline points="11 6 5 12 11 18" />
+                ) : (
+                  <polyline points="13 6 19 12 13 18" />
+                )}
+              </svg>
+            </div>
+            <span className="text-red-500 text-[9px] font-bold tracking-wide">SWIPE</span>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -276,11 +308,51 @@ function SwipeItem({ message, onDelete, highlight }: SwipeItemProps) {
 export default function App() {
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES)
   const [deletedIds, setDeletedIds] = useState<string[]>([])
+  const [showInstructions, setShowInstructions] = useState(true)
+  const [hasCompletedTask, setHasCompletedTask] = useState(false)
+
+  const startTimeRef = useRef<number>(Date.now())
+  const timeToDeleteRef = useRef<number | null>(null)
+
+  function handleStart() {
+    startTimeRef.current = Date.now() // timer starts here, not on page load
+    timeToDeleteRef.current = null
+    setHasCompletedTask(false)
+    setShowInstructions(false)
+  }
 
   const handleDelete = useCallback((id: string) => {
     setDeletedIds((prev) => [...prev, id])
     setMessages((prev) => prev.filter((m) => m.id !== id))
-  }, [])
+
+    const newCount = deletedIds.length + 1
+    if (newCount >= REQUIRED_DELETE_COUNT && timeToDeleteRef.current === null) {
+      timeToDeleteRef.current = Date.now() - startTimeRef.current
+      setHasCompletedTask(true)
+    }
+  }, [deletedIds])
+
+  function handleRateClick() {
+    const ctx = getContext()
+    // Falls back to time-since-start if they never completed the task,
+    // so we still capture something rather than sending null.
+    const elapsed = timeToDeleteRef.current ?? (Date.now() - startTimeRef.current)
+
+    window.Tally.openPopup('gD17jO', {
+      layout: 'modal',
+      hiddenFields: {
+        pid: ctx.pid,
+        pair: ctx.pair,
+        variant: ctx.isVariant ? 'lefthand' : 'baseline',
+        step: ctx.step,
+        elapsed_ms: elapsed,
+        grip_type: ctx.grip,
+      },
+      onSubmit: () => {
+        window.location.href = nextUrl(ctx)
+      },
+    })
+  }
 
   const unreadCount = messages.filter((m) => m.unread).length
 
@@ -338,7 +410,7 @@ export default function App() {
       </div>
 
       {/* Message list */}
-      <main className="flex-1 overflow-y-auto" style={{ backgroundColor: 'white' }}>
+      <main className="flex-1 overflow-y-auto pb-24" style={{ backgroundColor: 'white' }}>
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 gap-3">
             <div
@@ -366,7 +438,7 @@ export default function App() {
               <SwipeItem
                 message={msg}
                 onDelete={handleDelete}
-                highlight={msg.sender === 'Sarah Chen'}
+                disabled={showInstructions}
               />
               {i < messages.length - 1 && (
                 <div className="mx-4" style={{ height: '1px', backgroundColor: '#F3F4F6' }} />
@@ -384,6 +456,30 @@ export default function App() {
           borderTop: messages.length > 0 ? '1px solid #E5E7EB' : undefined,
         }}
       />
+
+      {/* Rate this prototype, fixed to the viewport so it stays visible while scrolling */}
+      <div className="fixed left-1/2 -translate-x-1/2 z-40" style={{ bottom: 'calc(24px + env(safe-area-inset-bottom))' }}>
+        <button
+          onClick={handleRateClick}
+          disabled={!hasCompletedTask}
+          className={`text-sm font-bold px-7 py-3 rounded-full transition-all ${
+            hasCompletedTask
+              ? 'bg-blue-500 text-white shadow-[0_4px_20px_rgba(59,130,246,0.6)] active:scale-95'
+              : 'bg-gray-300 text-gray-400 cursor-not-allowed'
+          }`}
+        >
+          Done testing — Rate this
+        </button>
+      </div>
+
+      {/* Instructions overlay, shown until participant taps Start */}
+      {showInstructions && (
+        <InstructionsOverlay
+          title={INSTRUCTIONS.message_inbox.title}
+          instructions={INSTRUCTIONS.message_inbox.text}
+          onStart={handleStart}
+        />
+      )}
     </div>
   )
 }
