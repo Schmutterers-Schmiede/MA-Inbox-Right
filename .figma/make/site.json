@@ -1,0 +1,10 @@
+{
+  "description": "Interactive mobile inbox mockup with swipe-to-delete messages offering a clean, responsive UI for testing and showcasing message management features.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
