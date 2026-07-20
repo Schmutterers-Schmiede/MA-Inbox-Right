@@ -348,7 +348,7 @@ export default function App() {
       hiddenFields: {
         pid: ctx.pid,
         pair: ctx.pair,
-        variant: ctx.isVariant ? 'lefthand' : 'baseline',
+        variant: ctx.variant,
         step: ctx.step,
         elapsed_ms: elapsed,
         grip_type: ctx.grip,

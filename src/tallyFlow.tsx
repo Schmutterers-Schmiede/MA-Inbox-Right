@@ -1,12 +1,23 @@
+export const PAIRS = ['amazon_nav', 'settings', 'control_center', 'message_inbox'];
+export const VARIANTS = ['baseline', 'lefthand', 'onehandmode'] as const;
+export type Variant = typeof VARIANTS[number];
+
 export const PROTOTYPE_URLS: Record<string, string> = {
-  amazon_nav_baseline: 'https://schmutterers-schmiede.github.io/MA-AmazonMockup-Right/',
-  amazon_nav_variant:  'https://schmutterers-schmiede.github.io/MA-AmazonMockup-Left/',
-  settings_baseline:   'https://schmutterers-schmiede.github.io/MA-MobileSettingsMenu-Right/',
-  settings_variant:    'https://schmutterers-schmiede.github.io/MA-MobileSettingsMenu-Left/',
-  control_center_baseline: 'https://schmutterers-schmiede.github.io/MA-iosControlCenter-Right/',
-  control_center_variant:  'https://schmutterers-schmiede.github.io/MA-iosControlCenter-Left/',
-  message_inbox_baseline: 'https://schmutterers-schmiede.github.io/MA-Inbox-Right/',
-  message_inbox_variant:  'https://schmutterers-schmiede.github.io/MA-Inbox-Left/', // TODO: confirm once the left-handed repo exists
+  amazon_nav_baseline:    'https://schmutterers-schmiede.github.io/MA-AmazonMockup-Right/',
+  amazon_nav_lefthand:    'https://schmutterers-schmiede.github.io/MA-AmazonMockup-Left/',
+  amazon_nav_onehandmode: 'https://schmutterers-schmiede.github.io/MA-AmazonMockup-Scaled/',
+
+  settings_baseline:    'https://schmutterers-schmiede.github.io/MA-MobileSettingsMenu-Right/',
+  settings_lefthand:    'https://schmutterers-schmiede.github.io/MA-MobileSettingsMenu-Left/',
+  settings_onehandmode: 'https://you.github.io/settings-ohm/', // TODO: not built yet
+
+  control_center_baseline:    'https://schmutterers-schmiede.github.io/MA-iosControlCenter-Right/',
+  control_center_lefthand:    'https://schmutterers-schmiede.github.io/MA-iosControlCenter-Left/',
+  control_center_onehandmode: 'https://you.github.io/control-center-ohm/', // TODO: not built yet
+
+  message_inbox_baseline:    'https://schmutterers-schmiede.github.io/MA-Inbox-Right/',
+  message_inbox_lefthand:    'https://schmutterers-schmiede.github.io/MA-Inbox-Left/',
+  message_inbox_onehandmode: 'https://you.github.io/inbox-ohm/', // TODO: not built yet
 };
 
 export const INSTRUCTIONS: Record<string, { title: string; text: string }> = {
@@ -34,19 +45,28 @@ export function getContext() {
   const order = (params.get('order') ?? '').split(',');
   const step = parseInt(params.get('step') ?? '0', 10);
   const grip = params.get('grip') ?? '';
-  const pairIndex = Math.floor(step / 2);
-  const isVariant = step % 2 === 1;
+
+  const pairIndex = Math.floor(step / VARIANTS.length);
+  const variantIndex = step % VARIANTS.length;
   const pair = order[pairIndex];
-  return { pid, order, step, grip, pair, isVariant };
+  const variant: Variant = VARIANTS[variantIndex];
+
+  return { pid, order, step, grip, pair, variant };
 }
 
 export function nextUrl(ctx: ReturnType<typeof getContext>) {
+  const totalSteps = PAIRS.length * VARIANTS.length; // 12
   const nextStep = ctx.step + 1;
-  if (nextStep >= 8) return `https://tally.so/r/gD17jO?pid=${ctx.pid}&grip=${ctx.grip}`;
-  const nextPairIndex = Math.floor(nextStep / 2);
-  const nextIsVariant = nextStep % 2 === 1;
+  if (nextStep >= totalSteps) {
+    return `https://tally.so/r/FINAL_FORM_ID?pid=${ctx.pid}&grip=${ctx.grip}`;
+  }
+
+  const nextPairIndex = Math.floor(nextStep / VARIANTS.length);
+  const nextVariantIndex = nextStep % VARIANTS.length;
   const nextPair = ctx.order[nextPairIndex];
-  const key = `${nextPair}_${nextIsVariant ? 'variant' : 'baseline'}`;
+  const nextVariant = VARIANTS[nextVariantIndex];
+
+  const key = `${nextPair}_${nextVariant}`;
   const base = PROTOTYPE_URLS[key];
   const sep = base.includes('?') ? '&' : '?';
   return `${base}${sep}pid=${ctx.pid}&order=${ctx.order.join(',')}&step=${nextStep}&grip=${ctx.grip}`;
