@@ -9,15 +9,14 @@ export const PROTOTYPE_URLS: Record<string, string> = {
 
   settings_baseline:    'https://schmutterers-schmiede.github.io/MA-MobileSettingsMenu-Right/',
   settings_lefthand:    'https://schmutterers-schmiede.github.io/MA-MobileSettingsMenu-Left/',
-  settings_onehandmode: 'https://you.github.io/settings-ohm/', // TODO: not built yet
+  settings_onehandmode: 'https://schmutterers-schmiede.github.io/MA-MobileSettingsMenu-OneHanded/',
 
   control_center_baseline:    'https://schmutterers-schmiede.github.io/MA-iosControlCenter-Right/',
   control_center_lefthand:    'https://schmutterers-schmiede.github.io/MA-iosControlCenter-Left/',
-  control_center_onehandmode: 'https://you.github.io/control-center-ohm/', // TODO: not built yet
+  control_center_onehandmode: 'https://schmutterers-schmiede.github.io/MA-iosControlCenter-OneHanded/', 
 
   message_inbox_baseline:    'https://schmutterers-schmiede.github.io/MA-Inbox-Right/',
   message_inbox_lefthand:    'https://schmutterers-schmiede.github.io/MA-Inbox-Left/',
-  message_inbox_onehandmode: 'https://you.github.io/inbox-ohm/', // TODO: not built yet
 };
 
 export const INSTRUCTIONS: Record<string, { title: string; text: string }> = {
