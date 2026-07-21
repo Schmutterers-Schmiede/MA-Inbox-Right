@@ -353,6 +353,7 @@ export default function App() {
         step: ctx.step,
         elapsed_ms: elapsed,
         grip_type: ctx.grip,
+        preference_step: ctx.preferenceStep, // 'skip' | 'two_way' | 'three_way'
       },
       onSubmit: () => {
         window.location.href = nextUrl(ctx)
