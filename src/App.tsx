@@ -412,19 +412,6 @@ export default function App() {
         </button>
       </header>
 
-      {/* Hint */}
-      <div
-        className="flex items-center justify-center gap-1.5 py-2"
-        style={{ backgroundColor: '#F9FAFB', borderBottom: '1px solid #E5E7EB' }}
-      >
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2">
-          <path d="M5 12h14M12 5l7 7-7 7" />
-        </svg>
-        <span className="text-xs" style={{ color: '#9CA3AF' }}>
-          Swipe {SWIPE_DIRECTION} to delete
-        </span>
-      </div>
-
       {/* Message list */}
       <main className="flex-1 overflow-y-auto pb-24" style={{ backgroundColor: 'white' }}>
         {messages.length === 0 ? (
