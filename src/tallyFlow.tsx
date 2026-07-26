@@ -41,7 +41,7 @@ export const INSTRUCTIONS: Record<string, { title: string; text: string }> = {
   },
   message_inbox: {
     title: "Inbox",
-    text: "Try deleting any 3 messages by swiping them. When you're done, tap 'Rate this' below.",
+    text: "Try deleting every message by swiping them. When you're done, tap 'Rate this' below.",
   },
 };
 

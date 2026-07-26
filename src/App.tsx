@@ -21,7 +21,6 @@ const SWIPE_DIRECTION: 'left' | 'right' = HANDEDNESS === 'right' ? 'left' : 'rig
 
 const DELETE_THRESHOLD = 0.35 // fraction of item width that commits delete
 const EDGE_INSET = 20        // px inset from screen edge before gesture starts
-const REQUIRED_DELETE_COUNT = 3 // number of messages participants must delete to complete the task
 const ctx = getContext();
 // ─── Data ─────────────────────────────────────────────────────────────────────
 interface Message {
@@ -83,6 +82,8 @@ const INITIAL_MESSAGES: Message[] = [
     avatarColor: '#94A3B8',
   },
 ]
+
+const REQUIRED_DELETE_COUNT = INITIAL_MESSAGES.length // participants must delete every message
 
 // ─── Swipe Item ───────────────────────────────────────────────────────────────
 interface SwipeItemProps {
@@ -338,6 +339,14 @@ export default function App() {
     }
   }, [deletedIds])
 
+  function handleReopenInstructions() {
+    setMessages(INITIAL_MESSAGES)
+    setDeletedIds([])
+    setHasCompletedTask(false)
+    timeToDeleteRef.current = null
+    setShowInstructions(true)
+  }
+
   function handleRateClick() {
     const ctx = getContext()
     // Falls back to time-since-start if they never completed the task,
@@ -464,8 +473,19 @@ export default function App() {
         }}
       />
 
-      {/* Rate this prototype, fixed to the viewport so it stays visible while scrolling */}
-      <div className="fixed left-1/2 -translate-x-1/2 z-40" style={{ bottom: 'calc(24px + env(safe-area-inset-bottom))' }}>
+      {/* Info button (reopens instructions) + Rate button, fixed to the viewport */}
+      <div className="fixed left-1/2 -translate-x-1/2 z-40 flex items-center gap-2" style={{ bottom: 'calc(24px + env(safe-area-inset-bottom))' }}>
+        <button
+          onClick={handleReopenInstructions}
+          aria-label="Show instructions again"
+          className="w-11 h-11 rounded-full bg-white text-gray-700 flex items-center justify-center shadow-md active:scale-95 transition-transform"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="16" x2="12" y2="12" />
+            <line x1="12" y1="8" x2="12.01" y2="8" />
+          </svg>
+        </button>
         <button
           onClick={handleRateClick}
           disabled={!hasCompletedTask}
@@ -482,8 +502,8 @@ export default function App() {
       {/* Instructions overlay, shown until participant taps Start */}
       {showInstructions && (
         <InstructionsOverlay
-          title={INSTRUCTIONS.control_center.title}
-          instructions={INSTRUCTIONS.control_center.text}
+          title={INSTRUCTIONS.message_inbox.title}
+          instructions={INSTRUCTIONS.message_inbox.text}
           onStart={handleStart}
           gripImage={GRIP_IMAGES[ctx.grip]}
         />
