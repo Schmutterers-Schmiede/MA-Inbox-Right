@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react'
-import { getContext, nextUrl, INSTRUCTIONS } from './tallyFlow'
-import { InstructionsOverlay } from './InstructionsOverlay'
+import { getContext, nextUrl } from './tallyFlow'
+import { InstructionsOverlay } from './instructionsOverlay'
 import { GRIP_IMAGES } from './gripImages';
 
 declare global {
@@ -482,15 +482,14 @@ export default function App() {
               : 'bg-gray-300 text-gray-400 cursor-not-allowed'
           }`}
         >
-          Done testing — Rate this
+          Rate Now
         </button>
       </div>
 
       {/* Instructions overlay, shown until participant taps Start */}
       {showInstructions && (
         <InstructionsOverlay
-          title={INSTRUCTIONS.message_inbox.title}
-          instructions={INSTRUCTIONS.message_inbox.text}
+          variant={ctx.variant}
           onStart={handleStart}
           gripImage={GRIP_IMAGES[ctx.grip]}
         />

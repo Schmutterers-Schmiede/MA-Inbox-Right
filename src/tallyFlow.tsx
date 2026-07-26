@@ -20,25 +20,6 @@ export const PROTOTYPE_URLS: Record<string, string> = {
   message_inbox_onehandmode: 'https://schmutterers-schmiede.github.io/MA-Inbox-OneHanded/',
 };
 
-export const INSTRUCTIONS: Record<string, { title: string; text: string }> = {
-  control_center: {
-    title: "Control Center",
-    text: "Try opening the control panel 3 separate times, closing it after each one. When you're done, tap 'Rate this' below.",
-  },
-  settings: {
-    title: "Settings Menu",
-    text: "Try toggling every setting on this screen at least once. When you're done, tap 'Rate this' below.",
-  },
-  amazon_nav: {
-    title: "App Navigation",
-    text: "Try visiting every tab in the navigation bar at least once. When you're done, tap 'Rate this' below.",
-  },
-  message_inbox: {
-    title: "Inbox",
-    text: "Try deleting every message by swiping them. When you're done, tap 'Rate this' below.",
-  },
-};
-
 export function getContext() {
   const params = new URLSearchParams(window.location.search);
   const pid = params.get('pid') ?? '';
