@@ -290,11 +290,12 @@ function SwipeItem({ message, onDelete, highlight, disabled }: SwipeItemProps) {
             gesture stays clear of the true screen edge. */}
         {!isDeleting && !disabled && Math.abs(offset) < 4 && (
           <div
-            className="absolute top-1/2 -translate-y-1/2 flex flex-col items-center gap-0.5 pointer-events-none"
+            className="absolute top-1/2 -translate-y-1/2 flex flex-row items-center gap-1.5 pointer-events-none"
             style={{ [SWIPE_DIRECTION === 'left' ? 'right' : 'left']: '28%' }}
           >
-            <div className="w-8 h-8 rounded-full border-2 border-red-500 flex items-center justify-center bg-white/70">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <span className="text-green-600 text-[9px] font-bold tracking-wide whitespace-nowrap">SWIPE</span>
+            <div className="w-8 h-8 rounded-full border-2 border-green-600 flex items-center justify-center bg-white/70 flex-shrink-0">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="5" y1="12" x2="19" y2="12" />
                 {SWIPE_DIRECTION === 'left' ? (
                   <polyline points="11 6 5 12 11 18" />
@@ -303,7 +304,6 @@ function SwipeItem({ message, onDelete, highlight, disabled }: SwipeItemProps) {
                 )}
               </svg>
             </div>
-            <span className="text-red-500 text-[9px] font-bold tracking-wide">SWIPE</span>
           </div>
         )}
       </div>
